@@ -1,7 +1,7 @@
 locals {
   # 共通設定
   service = "shirayama"
-  env     = "tes"
+  env     = "eks"
   prefix  = "${local.service}-${local.env}"
 
   required_tags = {
@@ -24,5 +24,8 @@ locals {
 
   # EKS
   cluster_version = "1.29"
+  eks_public_access_cidrs = [
+    "0.0.0.0/0"
+  ]
 
 }
