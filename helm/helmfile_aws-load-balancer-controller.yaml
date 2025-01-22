@@ -1,0 +1,17 @@
+environments:
+  dev:
+  prd:
+
+repositories:
+  - name: aws
+    url:  https://aws.github.io/eks-charts
+
+releases:
+  - name: aws-load-balancer-controller
+    namespace: kube-system
+    chart: aws/aws-load-balancer-controller
+    version: 1.7.2
+    atomic: true
+    disableValidationOnInstall: true
+    values:
+      - environments/{{ .Environment.Name }}/values/aws-load-balancer-controller.yaml

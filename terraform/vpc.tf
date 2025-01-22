@@ -20,7 +20,8 @@ resource "aws_subnet" "public_subnet" {
   availability_zone = each.value.az
 
   tags = {
-    Name = "${local.prefix}-public-${each.value.az}"
+    Name                     = "${local.prefix}-public-${each.value.az}"
+    "kubernetes.io/role/elb" = "1"
   }
 }
 

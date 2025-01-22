@@ -11,11 +11,13 @@ module "eks" {
   cluster_endpoint_public_access       = true
   cluster_endpoint_public_access_cidrs = local.eks_public_access_cidrs
 
+  cloudwatch_log_group_class = "INFREQUENT_ACCESS"
+
   ### Access Entry
   access_entries = {
     admin = {
       kubernetes_groups = []
-      principal_arn     =  join(", ", data.aws_iam_roles.sso_administrator.arns)
+      principal_arn     = join(", ", data.aws_iam_roles.sso_administrator.arns)
       policy_associations = {
         admin = {
           policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
@@ -26,35 +28,38 @@ module "eks" {
       }
     }
   }
+
   ## Managed Node Group
   eks_managed_node_groups = {
     system = {
-      name                       = "system"
-      use_name_prefix            = false
-      ami_id                     = "ami-06201496943722c09"
-      subnet_ids                 = [for value in aws_subnet.private_subnet : value.id]
-      min_size                   = 1
-      max_size                   = 1
-      desired_size               = 1
-      instance_types             = ["m6i.large", "m6i.xlarge", "m6i.2xlarge"]
-      capacity_type              = "SPOT"
-      enable_bootstrap_user_data = true
+      name                          = "system"
+      use_name_prefix               = false
+      ami_id                        = "ami-06201496943722c09"
+      subnet_ids                    = [for value in aws_subnet.private_subnet : value.id]
+      additional_security_group_ids = [module.node_sg.security_group_id]
+      min_size                      = 1
+      max_size                      = 1
+      desired_size                  = 1
+      instance_types                = ["m6i.large", "m6i.xlarge", "m6i.2xlarge"]
+      capacity_type                 = "SPOT"
+      enable_bootstrap_user_data    = true
       labels = {
         "workload/system" = "true"
       }
     },
     app = {
-      name                       = "app"
-      use_name_prefix            = false
-      ami_type                   = "AL2_x86_64"
-      ami_id                     = "ami-06201496943722c09"
-      subnet_ids                 = [for value in aws_subnet.private_subnet : value.id]
-      min_size                   = 1
-      max_size                   = 1
-      desired_size               = 1
-      instance_types             = ["m6i.large", "m6i.xlarge", "m6i.2xlarge"]
-      capacity_type              = "SPOT"
-      enable_bootstrap_user_data = true
+      name                          = "app"
+      use_name_prefix               = false
+      ami_type                      = "AL2_x86_64"
+      ami_id                        = "ami-06201496943722c09"
+      subnet_ids                    = [for value in aws_subnet.private_subnet : value.id]
+      additional_security_group_ids = [module.node_sg.security_group_id]
+      min_size                      = 1
+      max_size                      = 1
+      desired_size                  = 1
+      instance_types                = ["m6i.large", "m6i.xlarge", "m6i.2xlarge"]
+      capacity_type                 = "SPOT"
+      enable_bootstrap_user_data    = true
       labels = {
         "workload/app" = "true"
       }
@@ -88,7 +93,7 @@ resource "aws_autoscaling_schedule" "stop_eks_node-group" {
   min_size               = 0
   max_size               = 0
   desired_capacity       = 0
-  recurrence             = "0 23 * * MON-FRI"
+  recurrence             = "0 0 * * MON-FRI"
   time_zone              = "Asia/Tokyo"
   autoscaling_group_name = module.eks.eks_managed_node_groups_autoscaling_group_names[0]
 }
@@ -98,7 +103,7 @@ resource "aws_autoscaling_schedule" "start_eks_node-group" {
   min_size               = 1
   max_size               = 1
   desired_capacity       = 1
-  recurrence             = "0 7 * * MON-FRI"
+  recurrence             = "0 9 * * MON-FRI"
   time_zone              = "Asia/Tokyo"
   autoscaling_group_name = module.eks.eks_managed_node_groups_autoscaling_group_names[0]
 }

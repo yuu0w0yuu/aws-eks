@@ -1,0 +1,11 @@
+environments:
+  dev:
+  prd:
+
+releases:
+  - name: target-group-binding
+    namespace: apps
+    chart: ./charts/target-group-binding
+    version: 1.7.2
+    values:
+      - environments/{{ .Environment.Name }}/values/target-group-binding.yaml

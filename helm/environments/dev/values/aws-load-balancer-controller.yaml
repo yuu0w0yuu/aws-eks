@@ -1,0 +1,17 @@
+image:
+  repository: public.ecr.aws/eks/aws-load-balancer-controller
+  tag: v2.7.2
+  pullPolicy: IfNotPresent
+
+replicaCount: 1
+
+serviceAccount:
+  create: true
+  annotations:
+    eks.amazonaws.com/role-arn: "arn:aws:iam::926742232207:role/shirayama-eks-aws-load-balancer-controller-role"
+  name: aws-load-balancer-controller
+
+clusterName: shirayama-eks-cluster
+
+nodeSelector:
+  workload/system: "true"

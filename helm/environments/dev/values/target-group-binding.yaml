@@ -1,0 +1,8 @@
+fullnameOverride: test
+
+service:
+  name: "first"
+  port: "80"
+
+targetGroupARN: "arn:aws:elasticloadbalancing:ap-northeast-1:926742232207:targetgroup/shirayama-eks-tg/08632ffa603b529f"
+sourceSecurityGroupID: "sg-01274f622504bfbfa"
